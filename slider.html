@@ -1,0 +1,160 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		
+		<style>
+		    .container{
+	width:60%;
+	height:100%;
+	padding:13px;
+	border:1px solid gray;
+	-webkit-box-sizing:border-box;
+	-moz-box-sizing:border-box;
+	box-sizing:border-box;
+	background: black;	
+}
+.slider_wrapper{
+	overflow: hidden;
+	position:relative;
+	height:100%;
+	top:auto;
+}
+#image_slider{
+
+	position: relative;
+	height: auto;
+	list-style: none;
+	overflow: hidden;
+	clear: left;
+	/*Chrom default padding for ul is 40px */
+	
+	margin:0px;
+}
+#image_slider li{
+	position: relative;
+	float: left;
+}
+.nvgt{
+	position:absolute;
+	top: 0px;
+	height: 100%;
+	width: 50%;
+	opacity: 0;
+}
+.nvgt:hover{
+	opacity: 0.1;
+}
+#prev{
+	background: #000 url('https://dl.dropboxusercontent.com/u/65639888/image/prev.png') no-repeat center;
+	left: 0px;
+}
+#next{
+	background: #000 url('https://dl.dropboxusercontent.com/u/65639888/image/next.png') no-repeat center;
+	right: 0px;
+}
+
+		</style>
+	</head>
+
+	<body>
+		<div class="container">
+			<div class="slider_wrapper">
+				<ul id="image_slider">
+					<li><img src="images/ooc/os/01.ong" class="img-responsive" alt="this is a title"></li>
+					<li><img src="images/ooc/os/02.png" class="img-responsive" alt="this is a title"></li>
+					<li><img src="images/ooc/os/03.png" class="img-responsive" alt="this is a title"></li>
+					<li><img src="images/ooc/os/04.png" class="img-responsive" alt="this is a title"></li>
+					<li><img src="images/ooc/os/05.png" class="img-responsive" alt="this is a title"></li>
+					<li><img src="images/ooc/os/06.png" class="img-responsive" alt="this is a title"></li>
+				</ul>					
+				<span class="nvgt" id="prev">Right</span>
+				<span class="nvgt" id="next">Left</span>
+			</div>
+		</div>
+		
+		
+		<script>
+		    //1. set ul width 
+//2. image when click prev/next button
+var ul;
+var li_items;
+var imageNumber;
+var imageWidth;
+var prev, next;
+var currentPostion = 0;
+var currentImage = 0;
+
+
+function init(){
+	ul = document.getElementById('image_slider');
+	li_items = ul.children;
+	imageNumber = li_items.length;
+	imageWidth = li_items[0].children[0].clientWidth;
+	ul.style.width = parseInt(imageWidth * imageNumber) + 'px';
+	prev = document.getElementById("prev");
+	next = document.getElementById("next");
+	//.onclike = slide(-1) will be fired when onload;
+	/*
+	prev.onclick = function(){slide(-1);};
+	next.onclick = function(){slide(1);};*/
+	prev.onclick = function(){ onClickPrev();};
+	next.onclick = function(){ onClickNext();};
+}
+
+function animate(opts){
+	var start = new Date;
+	var id = setInterval(function(){
+		var timePassed = new Date - start;
+		var progress = timePassed / opts.duration;
+		if (progress > 1){
+			progress = 1;
+		}
+		var delta = opts.delta(progress);
+		opts.step(delta);
+		if (progress == 1){
+			clearInterval(id);
+			opts.callback();
+		}
+	}, opts.delay || 17);
+	//return id;
+}
+
+function slideTo(imageToGo){
+	var direction;
+	var numOfImageToGo = Math.abs(imageToGo - currentImage);
+	// slide toward left
+
+	direction = currentImage > imageToGo ? 1 : -1;
+	currentPostion = -1 * currentImage * imageWidth;
+	var opts = {
+		duration:1000,
+		delta:function(p){return p;},
+		step:function(delta){
+			ul.style.left = parseInt(currentPostion + direction * delta * imageWidth * numOfImageToGo) + 'px';
+		},
+		callback:function(){currentImage = imageToGo;}	
+	};
+	animate(opts);
+}
+
+function onClickPrev(){
+	if (currentImage == 0){
+		slideTo(imageNumber - 1);
+	} 		
+	else{
+		slideTo(currentImage - 1);
+	}		
+}
+
+function onClickNext(){
+	if (currentImage == imageNumber - 1){
+		slideTo(0);
+	}		
+	else{
+		slideTo(currentImage + 1);
+	}		
+}
+
+window.onload = init;
+		</script>
+	</body>
